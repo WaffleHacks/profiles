@@ -2,6 +2,8 @@ import type { AWS } from '@serverless/typescript';
 
 import hello from '@functions/hello';
 
+const tableName = 'profile-info-${sls:stage}';
+
 const serverlessConfiguration: AWS = {
   service: 'profiles',
   frameworkVersion: '3',
@@ -18,6 +20,18 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      USERS_TABLE: tableName,
+    },
+    iam: {
+      role: {
+        statements: [
+          {
+            Effect: 'Allow',
+            Action: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
+            Resource: [{ 'Fn::GetAtt': ['UsersTable', 'Arn'] }],
+          },
+        ],
+      },
     },
   },
   // import the function via paths
@@ -33,6 +47,34 @@ const serverlessConfiguration: AWS = {
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
+    },
+  },
+  resources: {
+    Resources: {
+      UsersTable: {
+        Type: 'AWS::DynamoDB::Table',
+        Properties: {
+          TableName: tableName,
+          TableClass: 'STANDARD',
+          AttributeDefinitions: [
+            {
+              AttributeName: 'id',
+              AttributeType: 'S',
+            },
+          ],
+          KeySchema: [
+            {
+              AttributeName: 'id',
+              KeyType: 'HASH',
+            },
+          ],
+          BillingMode: 'PROVISIONED',
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 5,
+            WriteCapacityUnits: 5,
+          },
+        },
+      },
     },
   },
 };
