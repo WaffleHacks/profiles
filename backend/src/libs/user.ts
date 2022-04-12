@@ -38,7 +38,13 @@ class User {
    */
   static async createFromParts(base: StaticProfile, provided: Record<string, string>) {
     const user = new User({ ...base, ...provided });
-    await documents.send(new PutCommand({ TableName: table, Item: { ...user } }));
+    await documents.send(
+      new PutCommand({
+        TableName: table,
+        Item: { ...user },
+        ConditionExpression: 'attribute_not_exists(id)',
+      }),
+    );
   }
 
   /**
