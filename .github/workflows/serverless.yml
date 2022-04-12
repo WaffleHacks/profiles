@@ -1,0 +1,25 @@
+name: Serverless
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version-file: backend/.nvmrc
+          cache: yarn
+          cache-dependency-path: backend/yarn.lock
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: ${{ github.run_id }}
+      - run: yarn deploy:prod
+        working-directory: backend
