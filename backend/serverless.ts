@@ -2,6 +2,7 @@ import type { AWS } from '@serverless/typescript';
 
 import authorizer from '@functions/authorizer';
 import create from '@functions/create';
+import fetch from '@functions/fetch';
 
 const tableName = 'profile-info-${sls:stage}';
 
@@ -39,7 +40,7 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { authorizer, create },
+  functions: { authorizer, create, fetch },
   package: { individually: true },
   custom: {
     esbuild: {
