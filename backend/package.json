@@ -13,11 +13,14 @@
     "@aws-sdk/client-dynamodb": "^3.67.0",
     "@aws-sdk/lib-dynamodb": "^3.67.0",
     "@middy/core": "^2.5.3",
-    "@middy/http-json-body-parser": "^2.5.3"
+    "@middy/http-json-body-parser": "^2.5.3",
+    "jsonwebtoken": "^8.5.1",
+    "jwks-rsa": "^2.0.5"
   },
   "devDependencies": {
     "@serverless/typescript": "^3.0.0",
     "@types/aws-lambda": "^8.10.71",
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "^14.14.25",
     "@typescript-eslint/eslint-plugin": "^5.19.0",
     "@typescript-eslint/parser": "^5.19.0",

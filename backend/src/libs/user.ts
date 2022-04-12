@@ -1,5 +1,7 @@
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
-import { DeleteCommand, DynamoDBDocumentClient, GetCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+
+import { StaticProfile } from '@libs/jwt';
 
 const table = process.env.USERS_TABLE;
 
@@ -29,6 +31,14 @@ class User {
     if (data.lastName && typeof data.lastName === 'string') this.lastName = data.lastName;
 
     if (!(this.id && this.email && this.firstName && this.lastName)) throw new Error('malformed database response');
+  }
+
+  /**
+   * Create a profile from its distinct parts
+   */
+  static async createFromParts(base: StaticProfile, provided: Record<string, string>) {
+    const user = new User({ ...base, ...provided });
+    await documents.send(new PutCommand({ TableName: table, Item: { ...user } }));
   }
 
   /**

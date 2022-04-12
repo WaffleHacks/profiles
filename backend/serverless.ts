@@ -1,6 +1,8 @@
 import type { AWS } from '@serverless/typescript';
 
+import authorizer from '@functions/authorizer';
 import hello from '@functions/hello';
+import initial from '@functions/initial';
 
 const tableName = 'profile-info-${sls:stage}';
 
@@ -21,6 +23,9 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       USERS_TABLE: tableName,
+      JWT_ISSUER: '${ssm:/profiles/issuer}',
+      JWT_HS256_SIGNING_TOKEN: '${ssm:/profiles/signing/hs256}',
+      JWT_RS256_SIGNING_JWKS_URI: '${ssm:/profiles/signing/rs256}',
     },
     iam: {
       role: {
@@ -35,7 +40,7 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { hello },
+  functions: { authorizer, hello, initial },
   package: { individually: true },
   custom: {
     esbuild: {
