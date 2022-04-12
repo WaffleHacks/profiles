@@ -110,6 +110,17 @@ const serverlessConfiguration: AWS = {
           SecurityPolicy: 'TLS_1_2',
         },
       },
+      DomainMapping: {
+        Type: 'AWS::ApiGateway::BasePathMapping',
+        Condition: 'IsProd',
+        Properties: {
+          DomainName: '${ssm:/profiles/domain}',
+          Stage: '${sls:stage}',
+          RestApiId: {
+            Ref: 'ApiGatewayRestApi',
+          },
+        },
+      },
     },
   },
 };
