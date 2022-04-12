@@ -71,10 +71,11 @@ class User {
       new UpdateCommand({
         TableName: table,
         Key: { id: this.id },
-        AttributeUpdates: {
-          email: { Value: this.email },
-          firstName: { Value: this.firstName },
-          lastName: { Value: this.lastName },
+        UpdateExpression: 'SET email = :email, firstName = :first, lastName = :last',
+        ExpressionAttributeValues: {
+          ':email': this.email,
+          ':first': this.firstName,
+          ':last': this.lastName,
         },
       }),
     );
