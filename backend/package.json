@@ -4,8 +4,8 @@
   "description": "Serverless aws-nodejs-typescript template",
   "main": "serverless.ts",
   "scripts": {
-    "deploy": "sls deploy",
-    "deploy:prod": "sls deploy -s prod"
+    "deploy": "yarn run sls deploy",
+    "deploy:prod": "yarn run sls deploy -s prod"
   },
   "engines": {
     "node": ">=14.15.0"
