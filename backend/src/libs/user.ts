@@ -1,5 +1,6 @@
-import { DynamoDB } from '@aws-sdk/client-dynamodb';
+import { DynamoDB, paginateScan } from '@aws-sdk/client-dynamodb';
 import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { unmarshall } from '@aws-sdk/util-dynamodb';
 
 import { StaticProfile } from '@libs/jwt';
 
@@ -45,6 +46,23 @@ class User {
         ConditionExpression: 'attribute_not_exists(id)',
       }),
     );
+  }
+
+  /**
+   * Get a list of all users in the table
+   */
+  static async all(): Promise<User[]> {
+    const users: User[] = [];
+
+    // Retrieve all profiles even if pagination is required
+    const paginator = paginateScan({ client: dynamodb }, { TableName: table });
+    for await (const page of paginator) {
+      page.Items.map((item) => unmarshall(item))
+        .map((item) => new User(item))
+        .forEach((u) => users.push(u));
+    }
+
+    return users;
   }
 
   /**

@@ -597,7 +597,7 @@
     "@aws-sdk/types" "3.55.0"
     tslib "^2.3.1"
 
-"@aws-sdk/util-dynamodb@3.67.0":
+"@aws-sdk/util-dynamodb@3.67.0", "@aws-sdk/util-dynamodb@^3.67.0":
   version "3.67.0"
   resolved "https://registry.yarnpkg.com/@aws-sdk/util-dynamodb/-/util-dynamodb-3.67.0.tgz#67fec66cd01418560679e28152ee66050faa228e"
   integrity sha512-bT/GIYOYE77qxZMfFK2j964rcCO2yY5ZiHQZi4r+QMg/+fiuI9uBNmcb6OFZCLaALkz/nsxoGVrDwzOgF1GleA==
