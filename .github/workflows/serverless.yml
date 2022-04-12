@@ -24,5 +24,6 @@ jobs:
           aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: ${{ github.run_id }}
+      - run: yarn install
       - run: yarn deploy:prod
         working-directory: backend
