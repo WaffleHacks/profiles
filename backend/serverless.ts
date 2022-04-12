@@ -68,6 +68,11 @@ const serverlessConfiguration: AWS = {
     },
   },
   resources: {
+    Conditions: {
+      IsProd: {
+        'Fn::Equals': ['${sls:stage}', 'prod'],
+      },
+    },
     Resources: {
       UsersTable: {
         Type: 'AWS::DynamoDB::Table',
@@ -91,6 +96,18 @@ const serverlessConfiguration: AWS = {
             ReadCapacityUnits: 5,
             WriteCapacityUnits: 5,
           },
+        },
+      },
+      CustomDomain: {
+        Type: 'AWS::ApiGateway::DomainName',
+        Condition: 'IsProd',
+        Properties: {
+          CertificateArn: '${ssm:/profiles/domain/certificate}',
+          DomainName: '${ssm:/profiles/domain}',
+          EndpointConfiguration: {
+            Types: ['EDGE'],
+          },
+          SecurityPolicy: 'TLS_1_2',
         },
       },
     },
