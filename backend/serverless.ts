@@ -46,7 +46,14 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { all, authorizer, create, fetch, single, update },
+  functions: {
+    authorizer,
+    manageAll: all,
+    manageSingle: single,
+    profileCreate: create,
+    profileFetch: fetch,
+    profileUpdate: update,
+  },
   package: { individually: true },
   custom: {
     esbuild: {
