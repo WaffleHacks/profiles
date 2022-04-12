@@ -1,10 +1,8 @@
 import type { AWS } from '@serverless/typescript';
 
 import authorizer from '@functions/authorizer';
-import create from '@functions/create';
-import fetch from '@functions/fetch';
 import { all, single } from '@functions/manage';
-import update from '@functions/update';
+import { create, fetch, update } from '@functions/profile';
 
 const tableName = 'profile-info-${sls:stage}';
 
