@@ -8,7 +8,7 @@ export default {
   events: [
     {
       http: {
-        path: 'initial',
+        path: 'profile',
         method: 'post',
         cors: true,
         authorizer: config,
