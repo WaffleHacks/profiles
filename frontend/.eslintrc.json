@@ -15,6 +15,7 @@
         "alphabetize": { "order": "asc", "caseInsensitive": true }
       }
     ],
-    "sort-imports": ["error", { "ignoreDeclarationSort": true }]
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }],
+    "@next/next/no-img-element": 0
   }
 }
