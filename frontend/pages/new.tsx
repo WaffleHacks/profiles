@@ -13,9 +13,7 @@ const AUTH0_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN || '';
  * The necessary attributes to retrieve from the session token
  */
 interface Profile {
-  sub: string;
   email: string;
-  picture: string;
 
   // Some of these may not be populated, so we need to figure out how to construct a partial name
   name?: string;
@@ -30,8 +28,8 @@ const New: NextPage = () => {
 
   const [state, setState] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [profile, setProfile] = useState<Profile>();
 
+  const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
@@ -43,8 +41,22 @@ const New: NextPage = () => {
     if (token) {
       setToken(token);
 
+      // Extract information from their token
       const decoded = decode(token, { complete: false, json: true });
-      setProfile(decoded as Profile);
+      if (decoded) {
+        const profile = decoded as Profile;
+        setEmail(profile.email);
+
+        // Attempt to figure out what their names are
+        if (profile.given_name && profile.family_name) {
+          setFirstName(profile.given_name);
+          setLastName(profile.family_name);
+        } else if (profile.name) {
+          const [maybeFirstName, ...maybeLastNames] = profile.name.split(' ');
+          setFirstName(maybeFirstName);
+          setLastName(maybeLastNames.join(' '));
+        } else if (profile.nickname) setFirstName(profile.nickname);
+      }
     }
 
     setState(queryParams.get('state'));
@@ -63,11 +75,7 @@ const New: NextPage = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          email: profile?.email,
-          firstName,
-          lastName,
-        }),
+        body: JSON.stringify({ email, firstName, lastName }),
       });
     } catch (e) {
       // TODO: notify user of error
@@ -85,7 +93,7 @@ const New: NextPage = () => {
   if (isFirstLoad) return <Loading />;
 
   // Handle invalid state
-  if (state === null || token === null || profile === undefined) return <InvalidState />;
+  if (state === null || token === null) return <InvalidState />;
 
   return (
     <>
@@ -107,7 +115,7 @@ const New: NextPage = () => {
               label="Email address"
               autoComplete="email"
               type="email"
-              value={profile.email}
+              value={email}
               help="We'll use this email to contact you"
               disabled
             />
