@@ -98,7 +98,7 @@ const New: NextPage = () => {
     }
 
     // Redirect back to Auth0 to complete sign in
-    window.location.assign(`${AUTH0_DOMAIN}/continue?state=${state}`);
+    window.location.assign(`${AUTH0_DOMAIN}/continue?state=${state}&session_token=${token}`);
   };
 
   // Handle loading state
