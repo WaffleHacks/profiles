@@ -1,5 +1,5 @@
 import { config } from '@functions/authorizer';
-import { resolve } from '@libs/lambda';
+import { cors, resolve } from '@libs/lambda';
 
 export default {
   handler: `${resolve(__dirname)}/handler.main`,
@@ -8,7 +8,7 @@ export default {
       http: {
         path: 'profile',
         method: 'get',
-        cors: true,
+        cors,
         authorizer: config,
       },
     },

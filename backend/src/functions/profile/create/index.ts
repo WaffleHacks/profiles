@@ -1,5 +1,5 @@
 import { config } from '@functions/authorizer';
-import { resolve } from '@libs/lambda';
+import { cors, resolve } from '@libs/lambda';
 
 import schema from './schema';
 
@@ -10,7 +10,7 @@ export default {
       http: {
         path: 'profile',
         method: 'post',
-        cors: true,
+        cors,
         authorizer: config,
         request: {
           schemas: {
