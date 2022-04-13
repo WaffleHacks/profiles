@@ -1,11 +1,12 @@
 import { RefreshIcon } from '@heroicons/react/outline';
 import { decode } from 'jsonwebtoken';
 import { NextPage } from 'next';
+import dynamic from 'next/dynamic';
 import { FormEvent, useEffect, useState } from 'react';
 
-import Input from '../components/Input';
-import InvalidState from '../components/InvalidState';
-import Loading from '../components/Loading';
+const Input = dynamic(() => import('../components/Input'));
+const InvalidState = dynamic(() => import('../components/InvalidState'));
+const Loading = dynamic(() => import('../components/Loading'));
 
 const AUTH0_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN || '';
 
