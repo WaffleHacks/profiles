@@ -33,6 +33,8 @@ const New: NextPage = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
+  const [error, setError] = useState<string>();
+
   // Retrieve the state and session token information for redirect
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -69,7 +71,7 @@ const New: NextPage = () => {
 
     // Create the user's profile
     try {
-      await fetch('https://api.id.wafflehacks.org/profile', {
+      const response = await fetch('https://api.id.wafflehacks.org/profile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,9 +79,18 @@ const New: NextPage = () => {
         },
         body: JSON.stringify({ email, firstName, lastName }),
       });
+
+      if (!response.ok) {
+        if (response.status === 401) setError('Your token has expired. Please go back and login again.');
+        else if (response.status === 400) setError('You must provide a first and last name');
+        else setError('An unexpected error occurred, please try again later');
+
+        setIsSubmitting(false);
+        return;
+      }
     } catch (e) {
-      // TODO: notify user of error
       console.log(e);
+      setError('An unexpected error occurred, please try again later');
 
       setIsSubmitting(false);
       return;
@@ -145,6 +156,7 @@ const New: NextPage = () => {
                 Finish
                 {isSubmitting && <RefreshIcon className="ml-2 h-5 w-5 animate-spin" />}
               </button>
+              {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
             </div>
           </form>
         </div>
