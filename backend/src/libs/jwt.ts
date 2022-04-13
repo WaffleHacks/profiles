@@ -2,21 +2,24 @@ import { decode, verify } from 'jsonwebtoken';
 import type { JwtPayload, VerifyOptions } from 'jsonwebtoken';
 import { JwksClient } from 'jwks-rsa';
 
-const ISSUER = process.env.JWT_ISSUER;
-const HS256_SIGNING_TOKEN = process.env.JWT_HS256_SIGNING_TOKEN;
-const RS256_SIGNING_JWKS_URI = process.env.JWT_RS256_SIGNING_JWKS_URI;
+const REDIRECT_ISSUER = process.env.JWT_REDIRECT_ISSUER;
+const REDIRECT_SIGNING_KEY = process.env.JWT_REDIRECT_SIGNING_KEY;
 
-const jwks = new JwksClient({ cache: true, jwksUri: RS256_SIGNING_JWKS_URI, timeout: 5000 });
-const options: VerifyOptions = {
-  audience: 'https://id.wafflehacks.org',
-  issuer: ISSUER,
-  complete: false,
-};
+const USER_ISSUER = process.env.JWT_USER_ISSUER;
+const USER_JWKS_URI = process.env.JWT_USER_JWKS_URI;
+
+const jwks = new JwksClient({ cache: true, jwksUri: USER_JWKS_URI, timeout: 5000 });
 
 export interface StaticProfile {
   id: string;
   email: string;
 }
+
+const verifyOptions = (issuer: string): VerifyOptions => ({
+  audience: 'https://id.wafflehacks.org',
+  issuer,
+  complete: false,
+});
 
 const tokenFromHeader = (header: string): string => {
   if (!header) throw new Error('Unauthorized');
@@ -43,12 +46,12 @@ export const validate = async (header: string): Promise<string> => {
   let verified;
   switch (decoded.header.alg) {
     case 'HS256':
-      verified = verify(token, HS256_SIGNING_TOKEN, options);
+      verified = verify(token, REDIRECT_SIGNING_KEY, verifyOptions(REDIRECT_ISSUER));
       return (verified as JwtPayload).sub;
 
     case 'RS256':
       const signingKey = await jwks.getSigningKey(decoded.header.kid);
-      verified = verify(token, signingKey.getPublicKey(), options);
+      verified = verify(token, signingKey.getPublicKey(), verifyOptions(USER_ISSUER));
       return (verified as JwtPayload).sub;
 
     default:

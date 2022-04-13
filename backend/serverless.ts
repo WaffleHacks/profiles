@@ -23,9 +23,10 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       USERS_TABLE: tableName,
-      JWT_ISSUER: '${ssm:/profiles/issuer}',
-      JWT_HS256_SIGNING_TOKEN: '${ssm:/profiles/signing/hs256}',
-      JWT_RS256_SIGNING_JWKS_URI: '${ssm:/profiles/signing/rs256}',
+      JWT_REDIRECT_ISSUER: '${ssm:/profiles/redirect/issuer}',
+      JWT_REDIRECT_SIGNING_KEY: '${ssm:/profiles/redirect/signing-key}',
+      JWT_USER_ISSUER: '${ssm:/profiles/user/issuer}',
+      JWT_USER_JWKS_URI: '${ssm:/profiles/user/jwks-uri}',
     },
     iam: {
       role: {
