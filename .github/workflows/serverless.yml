@@ -18,7 +18,7 @@ jobs:
         with:
           node-version-file: backend/.nvmrc
           cache: yarn
-          cache-dependency-path: backend/yarn.lock
+          cache-dependency-path: yarn.lock
       - uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: us-west-2
