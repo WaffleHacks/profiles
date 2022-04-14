@@ -1,7 +1,12 @@
+import { Auth0Provider } from '@auth0/auth0-react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 
 import '../styles/globals.css';
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || '';
+const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID || '';
+const DOMAIN = process.env.NEXT_PUBLIC_DOMAIN || '';
 
 function App({ Component, pageProps }: AppProps) {
   return (
@@ -19,7 +24,16 @@ function App({ Component, pageProps }: AppProps) {
       </Head>
 
       <div className="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <Component {...pageProps} />
+        <Auth0Provider
+          domain={DOMAIN}
+          clientId={CLIENT_ID}
+          redirectUri={BASE_URL}
+          cacheLocation="localstorage"
+          audience="https://id.wafflehacks.org"
+          scope="profile:read profile:edit"
+        >
+          <Component {...pageProps} />
+        </Auth0Provider>
       </div>
     </>
   );

@@ -4,6 +4,9 @@ import { NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import { FormEvent, useEffect, useState } from 'react';
 
+import { create } from '../components/api';
+import Header from '../components/Header';
+
 const Input = dynamic(() => import('../components/Input'));
 const InvalidState = dynamic(() => import('../components/InvalidState'));
 const Loading = dynamic(() => import('../components/Loading'));
@@ -68,27 +71,13 @@ const New: NextPage = () => {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (token === null) return;
+
     setIsSubmitting(true);
 
     // Create the user's profile
     try {
-      const response = await fetch('https://api.id.wafflehacks.org/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ email, firstName, lastName }),
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) setError('Your token has expired. Please go back and login again.');
-        else if (response.status === 400) setError('You must provide a first and last name');
-        else setError('An unexpected error occurred, please try again later');
-
-        setIsSubmitting(false);
-        return;
-      }
+      await create(token, { email, firstName, lastName });
     } catch (e) {
       console.log(e);
       setError('An unexpected error occurred, please try again later');
@@ -109,15 +98,7 @@ const New: NextPage = () => {
 
   return (
     <>
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <img
-          className="mx-auto h-24 w-auto"
-          src="https://wafflehacks-static.s3.us-west-2.amazonaws.com/logos/logo.png"
-          alt="WaffleHacks logo"
-        />
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Complete your profile</h2>
-        <p className="mt-2 text-center text-sm text-gray-600">Please check we have your information correct</p>
-      </div>
+      <Header title="Complete your profile" subtitle="Please check we have your information correct" />
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
