@@ -45,6 +45,13 @@ const Index: NextPage = () => {
             />
             <UpdatableField name="last" label="Last name" value={profile.lastName} onSave={onSave(token, 'lastName')} />
           </dl>
+          <button
+            type="button"
+            className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            onClick={() => window.history.back()}
+          >
+            Back
+          </button>
         </div>
       </div>
     </>
