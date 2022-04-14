@@ -36,16 +36,6 @@ const tokenFromHeader = (header: string): string => {
   return token;
 };
 
-export const staticProfile = (header: string): Profile => {
-  const token = tokenFromHeader(header);
-  const payload = decode(token, { json: true });
-  return {
-    type: ProfileType.User,
-    id: payload.sub,
-    email: payload.email,
-  };
-};
-
 export const validate = async (header: string): Promise<Profile> => {
   const token = tokenFromHeader(header);
   const decoded = decode(token, { complete: true });

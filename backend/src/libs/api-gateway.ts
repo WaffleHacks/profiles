@@ -3,7 +3,10 @@ import type { FromSchema } from 'json-schema-to-ts';
 
 import type { Profile } from '@libs/jwt';
 
-type ValidatedAPIGatewayProxyEvent<S> = Omit<APIGatewayProxyEventBase<Profile>, 'body'> & { body: FromSchema<S> };
+type APIGatewayProxyEvent = APIGatewayProxyEventBase<Profile>;
+export type APIGatewayProxyHandler = Handler<APIGatewayProxyEvent, APIGatewayProxyResult>;
+
+type ValidatedAPIGatewayProxyEvent<S> = Omit<APIGatewayProxyEvent, 'body'> & { body: FromSchema<S> };
 export type ValidatedEventAPIGatewayProxyEvent<S> = Handler<ValidatedAPIGatewayProxyEvent<S>, APIGatewayProxyResult>;
 
 // CORS headers to return

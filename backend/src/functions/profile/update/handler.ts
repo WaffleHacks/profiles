@@ -1,6 +1,5 @@
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { error, success } from '@libs/api-gateway';
-import { staticProfile } from '@libs/jwt';
 import { middyfy } from '@libs/lambda';
 import User from '@libs/user';
 
@@ -8,8 +7,7 @@ import schema from './schema';
 
 const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   // Fetch the user's profile
-  const id = staticProfile(event.headers.Authorization).id;
-  const profile = await User.get(id);
+  const profile = await User.get(event.requestContext.authorizer.id);
   if (!profile) return error(404, 'not found');
 
   // Update fields (the errors can be ignored here)
