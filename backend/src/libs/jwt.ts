@@ -15,10 +15,17 @@ export enum ProfileType {
   User = 'user',
 }
 
-export interface Profile {
-  type: ProfileType;
+export type Profile = ProfileSession | ProfileUser;
+
+interface ProfileSession {
+  type: ProfileType.Session;
   id: string;
-  email?: string;
+  email: string;
+}
+
+interface ProfileUser {
+  type: ProfileType.User;
+  id: string;
 }
 
 const verifyOptions = (issuer: string): VerifyOptions => ({
