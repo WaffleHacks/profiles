@@ -23,9 +23,9 @@ const buildArn = (arn: string): string => {
 
 export const main: APIGatewayTokenAuthorizerHandler = async (event) => {
   try {
-    const principalId = await validate(event.authorizationToken);
+    const profile = await validate(event.authorizationToken);
     return {
-      principalId,
+      principalId: profile.id,
       policyDocument: {
         Version: '2012-10-17',
         Statement: [
@@ -36,6 +36,8 @@ export const main: APIGatewayTokenAuthorizerHandler = async (event) => {
           },
         ],
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      context: profile as Record<string, any>,
     };
   } catch (e) {
     throw new Error('Unauthorized');

@@ -1,7 +1,9 @@
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Handler } from 'aws-lambda';
+import type { APIGatewayProxyEventBase, APIGatewayProxyResult, Handler } from 'aws-lambda';
 import type { FromSchema } from 'json-schema-to-ts';
 
-type ValidatedAPIGatewayProxyEvent<S> = Omit<APIGatewayProxyEvent, 'body'> & { body: FromSchema<S> };
+import type { Profile } from '@libs/jwt';
+
+type ValidatedAPIGatewayProxyEvent<S> = Omit<APIGatewayProxyEventBase<Profile>, 'body'> & { body: FromSchema<S> };
 export type ValidatedEventAPIGatewayProxyEvent<S> = Handler<ValidatedAPIGatewayProxyEvent<S>, APIGatewayProxyResult>;
 
 // CORS headers to return

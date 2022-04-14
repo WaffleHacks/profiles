@@ -2,8 +2,6 @@ import { DynamoDB, paginateScan } from '@aws-sdk/client-dynamodb';
 import { DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 
-import { StaticProfile } from '@libs/jwt';
-
 const table = process.env.USERS_TABLE;
 
 const dynamodb = new DynamoDB({});
@@ -35,10 +33,10 @@ class User {
   }
 
   /**
-   * Create a profile from its distinct parts
+   * Create a new user
    */
-  static async createFromParts(base: StaticProfile, provided: Record<string, string>) {
-    const user = new User({ ...base, ...provided });
+  static async create(id: string, email: string, firstName: string, lastName: string) {
+    const user = new User({ id, email, firstName, lastName });
     await documents.send(
       new PutCommand({
         TableName: table,

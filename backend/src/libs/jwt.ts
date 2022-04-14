@@ -10,9 +10,15 @@ const USER_JWKS_URI = process.env.JWT_USER_JWKS_URI;
 
 const jwks = new JwksClient({ cache: true, jwksUri: USER_JWKS_URI, timeout: 5000 });
 
-export interface StaticProfile {
+export enum ProfileType {
+  Session = 'session',
+  User = 'user',
+}
+
+export interface Profile {
+  type: ProfileType;
   id: string;
-  email: string;
+  email?: string;
 }
 
 const verifyOptions = (issuer: string): VerifyOptions => ({
@@ -30,29 +36,30 @@ const tokenFromHeader = (header: string): string => {
   return token;
 };
 
-export const staticProfile = (header: string): StaticProfile => {
+export const staticProfile = (header: string): Profile => {
   const token = tokenFromHeader(header);
   const payload = decode(token, { json: true });
   return {
+    type: ProfileType.User,
     id: payload.sub,
     email: payload.email,
   };
 };
 
-export const validate = async (header: string): Promise<string> => {
+export const validate = async (header: string): Promise<Profile> => {
   const token = tokenFromHeader(header);
   const decoded = decode(token, { complete: true });
 
   let verified;
   switch (decoded.header.alg) {
     case 'HS256':
-      verified = verify(token, REDIRECT_SIGNING_KEY, verifyOptions(REDIRECT_ISSUER));
-      return (verified as JwtPayload).sub;
+      verified = verify(token, REDIRECT_SIGNING_KEY, verifyOptions(REDIRECT_ISSUER)) as JwtPayload;
+      return { type: ProfileType.Session, id: verified.sub, email: verified.email };
 
     case 'RS256':
       const signingKey = await jwks.getSigningKey(decoded.header.kid);
-      verified = verify(token, signingKey.getPublicKey(), verifyOptions(USER_ISSUER));
-      return (verified as JwtPayload).sub;
+      verified = verify(token, signingKey.getPublicKey(), verifyOptions(USER_ISSUER)) as JwtPayload;
+      return { type: ProfileType.User, id: verified.sub };
 
     default:
       throw new Error('unsupported signature');
