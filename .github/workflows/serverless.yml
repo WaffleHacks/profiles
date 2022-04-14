@@ -25,6 +25,4 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: ${{ github.run_id }}
       - run: yarn install
-        working-directory: backend
-      - run: yarn deploy:prod
-        working-directory: backend
+      - run: yarn workspace backend deploy:prod
