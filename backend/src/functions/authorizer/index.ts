@@ -6,7 +6,8 @@ export default {
 
 export const config = {
   name: 'authorizer',
-  resultTtlInSeconds: 300,
+  // Cache for the duration of an Auth0 session token (15 mins)
+  resultTtlInSeconds: 900,
   identitySource: 'method.request.header.Authorization',
   type: 'TOKEN',
 };
