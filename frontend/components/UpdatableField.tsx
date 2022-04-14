@@ -4,7 +4,7 @@ interface Props {
   name: string;
   label: string;
   value: string;
-  onSave?: (v: string) => void;
+  onSave?: (v: string) => Promise<void>;
   autoComplete?: string;
   placeholder?: string;
 }
@@ -13,18 +13,31 @@ const UpdatableField = ({
   name,
   label,
   value: initialValue,
-  onSave = () => {},
+  onSave = async () => {},
   autoComplete,
   placeholder,
 }: Props): JSX.Element => {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState(initialValue);
 
   // If the passed value changes, update it
   useEffect(() => setValue(initialValue), [initialValue]);
 
-  const onToggleUpdate = () => {
-    if (isUpdating) onSave(value);
+  const onToggleUpdate = async () => {
+    if (isUpdating) {
+      setIsLoading(true);
+
+      try {
+        await onSave(value);
+      } catch (e) {
+        console.error(e);
+        setValue(initialValue);
+      }
+
+      setIsLoading(false);
+    }
+
     setIsUpdating(!isUpdating);
   };
 
@@ -57,8 +70,9 @@ const UpdatableField = ({
             <>
               <button
                 type="button"
-                className="mr-3 bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="mr-3 bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 disabled:text-indigo-400 disabled:hover:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 onClick={onCancel}
+                disabled={isLoading}
               >
                 Cancel
               </button>
@@ -70,9 +84,11 @@ const UpdatableField = ({
           <button
             type="button"
             onClick={onToggleUpdate}
-            className="bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 disabled:text-indigo-400 disabled:hover:text-indigo-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={isLoading}
           >
-            {isUpdating ? 'Save' : 'Update'}
+            {isLoading && 'Saving...'}
+            {!isLoading && (isUpdating ? 'Save' : 'Update')}
           </button>
         </span>
       </dd>

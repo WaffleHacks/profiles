@@ -1,3 +1,5 @@
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+
 export interface Profile {
   id: string;
   email: string;
@@ -23,7 +25,7 @@ const handleError = (r: Response) => {
  * @param profile the initial profile values
  */
 export const create = async (token: string, profile: ProfileCreate) => {
-  const response = await fetch('https://api.id.wafflehacks.org/profile', {
+  const response = await fetch(`${API_BASE}/profile`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -39,7 +41,7 @@ export const create = async (token: string, profile: ProfileCreate) => {
  * @param token an authentication token
  */
 export const get = async (token: string): Promise<Profile> => {
-  const response = await fetch('https://api.id.wafflehacks.org/profile', {
+  const response = await fetch(`${API_BASE}/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   handleError(response);
@@ -53,7 +55,7 @@ export const get = async (token: string): Promise<Profile> => {
  * @param update the fields to update
  */
 export const update = async (token: string, update: ProfileUpdate) => {
-  const response = await fetch('https://api.id.wafflehacks.org/profile', {
+  const response = await fetch(`${API_BASE}/profile`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',

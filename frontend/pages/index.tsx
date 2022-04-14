@@ -22,6 +22,8 @@ const Index: NextPage = () => {
     })();
   }, [isLoading, token]);
 
+  const onSave = (token: string, key: string) => async (value: string) => await update(token, { [key]: value });
+
   if (isLoading || !profile || !token) return <Loading />;
 
   return (
@@ -39,14 +41,9 @@ const Index: NextPage = () => {
               name="first"
               label="First name"
               value={profile.firstName}
-              onSave={(v) => update(token, { firstName: v })}
+              onSave={onSave(token, 'firstName')}
             />
-            <UpdatableField
-              name="last"
-              label="Last name"
-              value={profile.lastName}
-              onSave={(v) => update(token, { lastName: v })}
-            />
+            <UpdatableField name="last" label="Last name" value={profile.lastName} onSave={onSave(token, 'lastName')} />
           </dl>
         </div>
       </div>
