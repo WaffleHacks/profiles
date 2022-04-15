@@ -3,6 +3,7 @@ import type { AWS } from '@serverless/typescript';
 import authorizer from '@functions/authorizer';
 import { all, single } from '@functions/manage';
 import { create, fetch, update } from '@functions/profile';
+import sync from '@functions/sync';
 
 const tableName = 'profile-info-${sls:stage}';
 
@@ -10,6 +11,7 @@ const serverlessConfiguration: AWS = {
   service: 'profiles',
   frameworkVersion: '3',
   plugins: ['serverless-esbuild'],
+  configValidationMode: 'error',
   provider: {
     name: 'aws',
     stage: 'dev',
@@ -27,6 +29,9 @@ const serverlessConfiguration: AWS = {
       JWT_REDIRECT_SIGNING_KEY: '${ssm:/profiles/redirect/signing-key}',
       JWT_USER_ISSUER: '${ssm:/profiles/user/issuer}',
       JWT_USER_JWKS_URI: '${ssm:/profiles/user/jwks-uri}',
+      SYNC_TOPIC: {
+        Ref: 'SyncTopic',
+      },
     },
     iam: {
       role: {
@@ -42,6 +47,11 @@ const serverlessConfiguration: AWS = {
             ],
             Resource: [{ 'Fn::GetAtt': ['UsersTable', 'Arn'] }],
           },
+          {
+            Effect: 'Allow',
+            Action: ['sns:Publish'],
+            Resource: [{ Ref: 'SyncTopic' }],
+          },
         ],
       },
     },
@@ -54,6 +64,7 @@ const serverlessConfiguration: AWS = {
     profileCreate: create,
     profileFetch: fetch,
     profileUpdate: update,
+    sync,
   },
   package: { individually: true },
   custom: {
@@ -97,6 +108,9 @@ const serverlessConfiguration: AWS = {
             ReadCapacityUnits: 5,
             WriteCapacityUnits: 5,
           },
+          StreamSpecification: {
+            StreamViewType: 'NEW_IMAGE',
+          },
         },
       },
       CustomDomain: {
@@ -133,6 +147,41 @@ const serverlessConfiguration: AWS = {
           RestApiId: {
             Ref: 'ApiGatewayRestApi',
           },
+        },
+      },
+      SyncTopic: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          DisplayName: 'Profiles Sync (${sls:stage})',
+          TopicName: 'profiles-sync-${sls:stage}',
+          FifoTopic: false,
+          Subscription: [],
+        },
+      },
+      SyncTopicPolicy: {
+        Type: 'AWS::SNS::TopicPolicy',
+        Properties: {
+          PolicyDocument: {
+            Version: '2008-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  AWS: {
+                    'Fn::GetAtt': ['IamRoleLambdaExecution', 'Arn'],
+                  },
+                },
+                Action: ['sns:Publish'],
+                Resource: { Ref: 'SyncTopic' },
+                Condition: {
+                  ArnEquals: {
+                    'lambda:FunctionArn': { 'Fn::GetAtt': ['SyncLambdaFunction', 'Arn'] },
+                  },
+                },
+              },
+            ],
+          },
+          Topics: [{ Ref: 'SyncTopic' }],
         },
       },
     },
